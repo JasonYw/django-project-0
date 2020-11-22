@@ -75,4 +75,31 @@ day01
             在settings中最后导入local_settings
             创建自己的local_settings.py
             给别人代码时切记不要给local_settings文件
-        
+    今日作业
+        搭建项目环境
+        python代码实现把文件上传到腾讯对象存储
+        python sms
+
+day02
+    今日概要
+        腾讯发送短信
+        django的modelform组件
+        redis
+        注册逻辑的设计
+        开发
+        讲解
+    内容回顾
+        local_settings的作用：
+            本地配置信息
+            -开发 负责开发
+            -测试 负责测试
+            -运维 负责项目上线
+        .gitignore的作用
+            版本控制需要忽略掉的文件 不进行commit以及push
+        虚拟环境的作用
+            项目之间的隔离
+            开发：本地环境，代码上线时，若一个服务器跑多个项目需要做环境隔离
+            pip freeze > requirements.txt ->把当前虚拟环境中所有的模块均放到requirements.txt中
+            pip install -r requirements.txt 把文件中所有的模块安装
+            requirements 不要用其他的名字 潜规则
+            
