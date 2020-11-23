@@ -102,4 +102,9 @@ day02
             pip freeze > requirements.txt ->把当前虚拟环境中所有的模块均放到requirements.txt中
             pip install -r requirements.txt 把文件中所有的模块安装
             requirements 不要用其他的名字 潜规则
+    今日详细
+        腾讯发送短信
+            注册
+            登陆
+            wiki：pythonav.com/wiki/detail/10/81/
             
