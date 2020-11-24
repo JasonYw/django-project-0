@@ -107,4 +107,4 @@ day02
             注册
             登陆
             wiki：pythonav.com/wiki/detail/10/81/
-            
+            安装sdk
