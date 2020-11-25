@@ -7,5 +7,4 @@ __pycache__/
 */__pycache__/
 .env
 .vscode
-!.vscode/settings.json
 project_0/db.sqlite3

@@ -4,7 +4,7 @@ import ssl
 import settings
 # ssl._create_default_https_context = ssl._create_unverified_context
 
-appkey =settings.   
+appkey =settings.APPKEY
 def send_sms_single(phone_num, template_id, template_param_list):
     """
     单条发送短信
