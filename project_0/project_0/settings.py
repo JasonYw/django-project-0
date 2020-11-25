@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'project_0.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'xxxx',
+        'NAME': 'xxxxxxx',
+        'USER': 'xxxx',
+        'PASSWORD':'xxxxx',
+        'HOST':'xxxx',
+        'PORT':'xxxx'
     }
 }
 
@@ -115,12 +119,12 @@ USE_L10N = True
 USE_TZ = True
 
 #短信模板
-SMSSIGN ='夜空下的rico'
-APPKEY='ed2fa00255d68d9732a1ac53239e20ef'
-SSDAPPID ='1400452867'
-LOGINID ='785497'
-REGISTERID ='785496'
-RESETPASSWORDID ='785498'
+SMSSIGN ='xxxxx'
+APPKEY='xxxxx'
+SSDAPPID ='xxxxx'
+LOGINID ='xxxxx'
+REGISTERID ='xxxxx'
+RESETPASSWORDID ='xxxxx'
 
 
 # Static files (CSS, JavaScript, Images)

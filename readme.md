@@ -108,3 +108,7 @@ day02
             登陆
             wiki：pythonav.com/wiki/detail/10/81/
             安装sdk
+        Django的ModelFOrm
+            自动生成标签
+            表单验证
+            
