@@ -1,10 +1,19 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import ssl
-import settings
+import sys
+import os
+from qcloudsms_py import SmsMultiSender, SmsSingleSender
+from qcloudsms_py.httpclient import HTTPError
+project_dir =os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+sys.path.append(project_dir)
+from project_0 import settings
 # ssl._create_default_https_context = ssl._create_unverified_context
 
-appkey =settings.APPKEY
+
+APPKEY =settings.APPKEY
+SMSSIGH =settings.SMSSIGN
+
 def send_sms_single(phone_num, template_id, template_param_list):
     """
     单条发送短信
@@ -14,14 +23,14 @@ def send_sms_single(phone_num, template_id, template_param_list):
     :return:
     """
     appid = 112142311  # 自己应用ID
-    appkey = "8cc5b87123y423423412387930004"  # 自己应用Key
-    sms_sign = "Python之路"  # 自己腾讯云创建签名时填写的签名内容（使用公众号的话这个值一般是公众号全称或简称）
-    sender = SmsSingleSender(appid, appkey)
+    sender = SmsSingleSender(appid, APPKEY)
     try:
-        response = sender.send_with_param(86, phone_num, template_id, template_param_list, sign=sms_sign)
+        response = sender.send_with_param(86, phone_num, template_id, template_param_list, sign=SMSSIGH)
     except HTTPError as e:
         response = {'result': 1000, 'errmsg': "网络异常发送失败"}
     return response
+
+
 def send_sms_multi(phone_num_list, template_id, param_list):
     """
     批量发送短信
@@ -31,11 +40,12 @@ def send_sms_multi(phone_num_list, template_id, param_list):
     :return:
     """
     appid = 112142311
-    appkey = "8cc5b87123y423423412387930004"
-    sms_sign = "Python之路"
-    sender = SmsMultiSender(appid, appkey)
+    sender = SmsMultiSender(appid, APPKEY)
     try:
-        response = sender.send_with_param(86, phone_num_list, template_id, param_list, sign=sms_sign)
+        response = sender.send_with_param(86, phone_num_list, template_id, param_list, sign=SMSSIGH)
     except HTTPError as e:
         response = {'result': 1000, 'errmsg': "网络异常发送失败"}
     return response
+
+if __name__ == "__main__":
+    print(APPKEY)
