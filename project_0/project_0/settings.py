@@ -55,7 +55,7 @@ ROOT_URLCONF = 'project_0.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,TEMPLATES)],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -115,15 +115,21 @@ USE_L10N = True
 USE_TZ = True
 
 #短信模板
-SMS =0
-
+SMSSIGN ='夜空下的rico'
+APPKEY='ed2fa00255d68d9732a1ac53239e20ef'
+SSDAPPID ='1400452867'
+LOGINID ='785497'
+REGISTERID ='785496'
+RESETPASSWORDID ='785498'
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATICFILES_DIRS =(
+    os.path.join(BASE_DIR,'static'),
+)
 
 try:
     from .local_settings import *
