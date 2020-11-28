@@ -3,6 +3,7 @@
 import ssl
 import sys
 import os
+import redis
 from qcloudsms_py import SmsMultiSender, SmsSingleSender
 from qcloudsms_py.httpclient import HTTPError
 
@@ -61,6 +62,34 @@ class ReginterSMS(BaseSMS):
 class ResetPasswordSMS(BaseSMS):
     APPID = RESETPASSWORDID
     EXPIRES = None
+
+
+class BaseUserSms:
+    conn = redis.Redis(
+        host="192.168.1.18", port=6379, password="0125", encoding="utf-8"
+    )
+
+    @classmethod
+    def record_register(cls, phonenumber, code):
+        cls.conn.set(phonenumber, str(code) + cls.functioncode, ex=600)
+
+    @classmethod
+    def get_record(cls, phonenumber):
+        if cls.conn.get(phonenumber).decode("utf-8") == None:
+            return None
+        return cls.conn.get(phonenumber).decode("utf-8").replace(cls.functioncode, "")
+
+
+class RegisterUserSms(BaseUserSms):
+    functioncode = "register"
+
+
+class LoginUserSms(BaseUserSms):
+    functioncode = "login"
+
+
+class ResetpasswordUserSms(BaseUserSms):
+    functioncode = "restpassword"
 
 
 # def send_sms_multi(phone_num_list, template_id, param_list):

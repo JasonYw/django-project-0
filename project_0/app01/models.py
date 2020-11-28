@@ -1,24 +1,15 @@
+# import django
+import os
+
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project_0.settings")# project_name 项目名称
+# django.setup()
 from django.db import models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django import forms
-import redis
+
 
 # Create your models here.
-
-
-class UserSms:
-    conn = redis.Redis(
-        host="192.168.1.18", port=6379, password="0125", encoding="utf-8"
-    )
-
-    @classmethod
-    def record_register(cls, phonenumber, code, functioncode):
-        cls.conn.set(phonenumber, str(code) + functioncode, ex=600)
-
-    @classmethod
-    def get_record(cls, phonenumber):
-        cls.conn.get(phonenumber)
 
 
 class UserInfo(models.Model):
