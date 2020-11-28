@@ -11,17 +11,77 @@
 </head>
 
 <body>
-    <h1>register</h1>
-    <form>
+    <div style="margin-right:auto; margin-left:auto; width: 400px;">
+        <h1>register</h1>
+        <form id='registerform'>
+            {% csrf_token %}
+            {% for filed in form %}
+            {% if filed.name == 'code' %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ filed.label }}</label>
+                <div class="clearfix">
+                    <div class="col-md-6" style="padding: 0;">{{ filed }}</div>
+                    <div class="col-md-6"><input type="button" class="btn btn-default" value="获取验证码"
+                            onclick="getcode(this);"></div>
+                </div>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ filed.label }}</label>
+                {{ filed }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            <div>
+                <input type="button" class="btn btn-primary" onclick="register();" value="注册">
+            </div>
 
-        {% for filed in form %}
-        <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ filed.label }}</label>
-            {{ filed }}
-            <!-- <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email"> -->
-        </div>
-        {% endfor %}
 
-        <button type="submit" class="btn btn-default">注册</button>
-    </form>
+        </form>
+    </div>
 </body>
+<script>
+    function getcode(obj) {
+        csrf = $('input[name="csrfmiddlewaretoken"]').val()
+        phonenumber = $('input[name="phonenumber"]').val()
+        $.ajax({
+            url: '/app01/send/sms/',
+            type: 'POST',
+            data: {
+                'phonenumber': phonenumber,
+                'csrfmiddlewaretoken': csrf,
+                'functioncode': 'register'
+            },
+            success: function (data) {
+                if (data == '200') {
+                    var count = 60
+                    var timer = setInterval(function () {
+                        $(obj).removeAttr("onclick", "getcode(this)")
+                        count--
+                        $(obj).val(count + '秒后获取验证码')
+                        if (count <= 0) {
+                            clearInterval(timer)
+                            $(obj).val('获取验证码')
+                            $(obj).attr('onclick', 'getcode(this)')
+                        }
+                    }, 1000)
+
+                } else {
+                    alert(data)
+                }
+            }
+        })
+    }
+
+    function register(obj) {
+        $.ajax({
+            type: 'post',
+            url: 'app01/register/',
+            data: $('#registerform').serialize(),
+            dataType: 'JSON',
+            success: function (args) {
+                alert(args[0])
+            }
+        })
+    }
+</script>
