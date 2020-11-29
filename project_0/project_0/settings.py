@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "app01",
+    "appweb",
 ]
 
 MIDDLEWARE = [
@@ -85,6 +86,20 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "xxxxx",  # 安装reids的IP以及端口号
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_reids.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {  # 内部创建的连接池
+                "max_connections": 1000,
+                "encoding": "utf-8",
+            },
+            "PASSWORD": "xxxxxxxx",  # redis密码 #需要密码才需要加
+        },
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators

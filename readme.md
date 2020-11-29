@@ -132,3 +132,85 @@ day02
             检验手机号是否合法，并向手机发送短信，
                 验证码时效性处理 一分钟处理
                 把手机号与验证码存入redis，同时给手机号发信息，redis有定时功能
+day03
+    今日概要
+        注册
+        短信密码登录
+        用户名密码登录
+    内容回顾
+        虚拟环境 virtualenv
+        pip freeze > requirements.txt
+        local_settings.py
+        gitignore
+        短信腾讯云/阿里云短信(阅读文档、谷歌、必应、搜狗)
+            API -> 访问url 并根据文档传入参数
+            SDK -> 模块，开发包、基于模块完成功能
+            优先看sdk 不行再看api
+        redis，帮我们在内存中可以存取数据的软件(基于内存的数据库)
+            1.在A主机安装redis&配置&启动
+            2.连接redis
+                方式一 利用redis提供的客户端
+                方式二 利用相关模块
+                    安装模块
+                    使用模块
+                        ->不推荐以下使用方式
+                            import redis
+                            # 连接redis
+                            conn = redis.Redis(
+                                host="192.168.1.18", port=6379, password="0125", encoding="utf-8"
+                            )  # host为本机ip
+                            # 设置键值对
+                            # conn.set(
+                            #     "15801367721", 9999, ex=60
+                            # )  # 手机号 验证码 超时时间超时后自动清空此条数据，其中验证码为int 但是写入redis时会转成字符串，并通过encoding 转换成字节
+                            # # 获取值
+                            values = conn.get("15801367721")  # 没有值返回None，有值的话返回字节类型
+                            print(values)
+                        ->官方推荐使用连接池
+                            import redis
+                            # 连接redis
+                            conn = redis.ConnectionPool(
+                                host="192.168.1.18", port=6379, password="0125", encoding="utf-8",max_connections=1000
+                            )  # host为本机ip
+                            conn =redis.Redis(connection_pool=pool)
+                            # 设置键值对
+                            # conn.set(
+                            #     "15801367721", 9999, ex=60
+                            # )  # 手机号 验证码 超时时间超时后自动清空此条数据，其中验证码为int 但是写入redis时会转成字符串，并通过encoding 转换成字节
+                            # # 获取值
+                            values = conn.get("15801367721")  # 没有值返回None，有值的话返回字节类型
+                            print(values)
+                        ->django-redis
+                            目的:在django中方便的使用redis
+                            使用步骤
+                                安装 pip install django-redis
+                                在settings中配置，放在local_settings中
+                                    CACHES ={
+                                        "default:"{
+                                            "BACKEND":"django_redis.cache.RedisCache",
+                                            "LOCATION":"xxxxx", #安装reids的IP以及端口号
+                                            "OPTIONS":{
+                                                "CLIENT_CLASS":"django_reids.client.DefaultClient",
+                                                "CONNECTION_POOL_KWARGS":{ #内部创建的连接池
+                                                    "max_connections":1000,
+                                                    "encoding":"utf-8"
+                                                },
+                                                "PASSWORD":'xxxxxxxx' #redis密码 #需要密码才需要加
+                                            }
+                                        }
+                                    }
+                                使用
+                                    from django.shortcuts import HttpResponse
+                                    from django_redis import get_redis_connection
+                                    def index(request):
+                                        conn =get_redis_connection("default") #去链接池获取default的连接池
+                                        conn.set('nickname','rico',ex=10)
+                                        value =conn.get('nickname')
+                                        print(value)
+                                        return HttpResponse('ok')
+                                    项目中读写分离可能会用到两台redis
+    今日详细
+        实现注册
+            展示注册页面
+            点击获取验证码
+            点击注册
