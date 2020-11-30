@@ -4,12 +4,23 @@ import os
 import json
 import random
 from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
 
 project_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 sys.path.append(project_dir)
 from utils.tencent.sms import LoginSMS, ReginterSMS, ResetPasswordSMS, RegisterUserSms
-from appweb.forms.account import RegisterModelForm
+from appweb.forms.account import RegisterModelForm, SendSmsForm
 from appweb.models import UserInfo
+
+
+def send_sms(request):
+    """
+    发送短信
+    """
+    form = SendSmsForm(data=request.GET)  # 校验手机号不能为空、格式是否正确
+    if form.is_valid():
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False, "error": form.errors})
 
 
 def register(request):

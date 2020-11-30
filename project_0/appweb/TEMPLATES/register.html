@@ -38,7 +38,7 @@
         csrf = $('input[name="csrfmiddlewaretoken"]').val()
         phonenumber = $('input[name="phonenumber"]').val()
         $.ajax({
-            url: '/app01/send/sms/',
+            url: '/appweb/send/sms/',
             type: 'POST',
             data: {
                 'phonenumber': phonenumber,
@@ -46,22 +46,23 @@
                 'functioncode': 'register'
             },
             success: function (data) {
-                if (data == '200') {
-                    var count = 60
-                    var timer = setInterval(function () {
-                        $(obj).removeAttr("onclick", "getcode(this)")
-                        count--
-                        $(obj).val(count + '秒后获取验证码')
-                        if (count <= 0) {
-                            clearInterval(timer)
-                            $(obj).val('获取验证码')
-                            $(obj).attr('onclick', 'getcode(this)')
-                        }
-                    }, 1000)
+                console.log(data)
+                // if (data == '200') {
+                //     var count = 60
+                //     var timer = setInterval(function () {
+                //         $(obj).removeAttr("onclick", "getcode(this)")
+                //         count--
+                //         $(obj).val(count + '秒后获取验证码')
+                //         if (count <= 0) {
+                //             clearInterval(timer)
+                //             $(obj).val('获取验证码')
+                //             $(obj).attr('onclick', 'getcode(this)')
+                //         }
+                //     }, 1000)
 
-                } else {
-                    alert(data)
-                }
+                // } else {
+                //     alert(data)
+                // }
             }
         })
     }
@@ -69,7 +70,7 @@
     function register(obj) {
         $.ajax({
             type: 'post',
-            url: 'app01/register/',
+            url: 'appweb/register/',
             data: $('#registerform').serialize(),
             dataType: 'JSON',
             success: function (args) {
