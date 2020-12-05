@@ -70,12 +70,12 @@ class BaseUserSms:
     )
 
     @classmethod
-    def record_register(cls, phonenumber, code, ex=60):
+    def record_register(cls, phonenumber, code, ex=600):
         cls.conn.set(phonenumber, str(code) + cls.functioncode, ex=ex)
 
     @classmethod
     def get_record(cls, phonenumber):
-        if cls.conn.get(phonenumber).decode("utf-8") == None:
+        if cls.conn.get(phonenumber) == None:
             return None
         return cls.conn.get(phonenumber).decode("utf-8").replace(cls.functioncode, "")
 

@@ -77,11 +77,18 @@
             data: $('#registerform').serialize(),
             dataType: 'JSON',
             success: function (args) {
-                if (args.status == 'False') {
+                $('input[name="password"]').attr("placeholder", "请输入密码")
+                if (!args.status) {
+                    console.log(args.message)
                     $.each(args.message, function (index, value) {
                         console.log(args.status, index, value)
-                        $('input[name=' + index + ']').val("")
-                        $('input[name=' + index + ']').attr('placeholder', value[0])
+                        if (value[0] == "验证码错误") {
+                            $('input[name=code]').val("")
+                            $('input[name=code]').attr('placeholder', value[0])
+                        } else {
+                            $('input[name=' + index + ']').val("")
+                            $('input[name=' + index + ']').attr('placeholder', value[0])
+                        }
                     })
                     $('input[name="password"]').val("")
                     $('input[name="confirm_password"]').val("")

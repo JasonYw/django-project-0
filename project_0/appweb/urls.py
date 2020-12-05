@@ -11,4 +11,5 @@ from appweb.views import account
 urlpatterns = [
     url(r"^register/", account.register, name="register"),
     url(r"^send/sms/", account.send_sms, name="register"),
+    url(r"^login/", account.login, name="register"),
 ]

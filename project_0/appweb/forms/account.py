@@ -137,4 +137,110 @@ class SendSmsForm(forms.Form):
         return phonenumber
 
 
+class ClickRegisterForm(forms.Form):
+
+    email = forms.EmailField(
+        label="邮箱",
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入注册邮箱"}
+        ),
+        error_messages={"required": "邮箱不能为空"},
+    )
+
+    phonenumber = forms.CharField(
+        label="手机号",
+        validators=[RegexValidator(r"^(1[3-9]\d{9}$)", "手机号格式错误")],
+        required=True,
+    )
+
+    password = forms.CharField(
+        label="密码",
+        required=True,
+        validators=[RegexValidator(r"^[0-9a-zA-Z\-_@#\$%\&\=\+\!]+$", "密码格式错误")],
+        max_length=20,
+        min_length=8,
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control", "placeholder": "请输入密码"}
+        ),
+        error_messages={
+            "required": "密码不能为空",
+            "max_length": "密码不能超过20个字符",
+            "min_length": "密码不能小于8个字符",
+        },
+    )
+
+    username = forms.CharField(
+        label="用户名",
+        required=True,
+        validators=[RegexValidator(r"^[0-9a-zA-Z\-_]{1,30}$", "用户名只支持数字字母以及-_")],
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入用户名"}
+        ),
+        error_messages={"required": "用户名不能为空"},
+    )
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    def clean_email(self):
+
+        email = self.request.POST.get("email")
+
+        if UserInfo.objects.filter(email=email).exists():
+            raise ValidationError("邮箱已经存在")
+
+        return email
+
+    def clean_password(self):
+        password = self.request.POST.get("password")
+        confirm_password = self.request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            raise ValidationError("密码两次不一致")
+
+        return password
+
+    def clean_phonenumber(self):
+        code = self.request.POST.get("code")
+        phonenumber = self.request.POST.get("phonenumber")
+        if RegisterUserSms.get_record(phonenumber) != code:
+            raise ValidationError("验证码错误")
+
+        return phonenumber
+
+
+class LoginModelForm(forms.ModelForm):
+
+    email = forms.EmailField(
+        label="邮箱",
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入注册邮箱"}
+        ),
+        error_messages={"required": "邮箱不能为空"},
+    )
+
+    password = forms.CharField(
+        label="密码",
+        required=True,
+        validators=[RegexValidator(r"^[0-9a-zA-Z\-_@#\$%\&\=\+\!]+$", "密码格式错误")],
+        max_length=20,
+        min_length=8,
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control", "placeholder": "请输入密码"}
+        ),
+        error_messages={
+            "required": "密码不能为空",
+            "max_length": "密码不能超过20个字符",
+            "min_length": "密码不能小于8个字符",
+        },
+    )
+
+    class Meta:
+        model = UserInfo
+        fields = ["email", "password"]
+
+
 # Create your models here.
