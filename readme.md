@@ -210,7 +210,98 @@ day03
                                         return HttpResponse('ok')
                                     项目中读写分离可能会用到两台redis
     今日详细
-        实现注册
-            展示注册页面
-            点击获取验证码
-            点击注册
+        1.2.1按钮绑定点击事件
+        1.2.2获取手机号
+        1.2.3发送ajax
+        1.2.4手机号校验
+            不能为空
+            格式正确
+            没有注册过
+        1.2.5验证通过
+            发送短信
+            将短信保存在redis中
+        1.2.6成功失败
+            失败、错误信息
+            成功、倒计时
+                disabled属性
+                    $('#btnSms').prop("disabled",true); 添加此属性表示不可操作
+                    $('#btnSms').prop("disabled",false); 相当于移出此属性
+                定时器
+                    var obj =setInterval(function(){
+                        console.log(123);
+                    },1000) 开启定时器
+                    clearInterval(obj) 关闭定时器
+                实例
+                    var time=60
+                    var obj=setInterval(function(){
+                        time =time-1
+                        if(time<1){
+                            clearInterval(obj)
+                        }
+                    },1000)
+
+    今日回顾
+        视图views.py ->views目录
+        模板,根目录templates ->根据app注册顺序去每个app的templates中
+        静态文件
+        项目中多个app且想要各自模板，静态文件隔离，建议通过app名称再进行嵌套即可
+        路由分发
+            include
+            namespace
+        母版
+            title
+            css
+            content
+            js
+        功能
+            bootstrap导航条 去除圆角 container
+            modelform生成html标签，自动id id_字段名
+            发送ajax请求
+                $.ajax({
+                    url:'/index/',
+                    type:'GET',
+                    data:{},
+                    dataType:"JSON",
+                    success:function(res){
+                        console.log(res)
+                    }
+                })
+            form&modelform可以进行表单验证
+                form = sendsmsform(request,data=request.POST) #queryset
+                form = sendsmsform(request,data=request.GET) #queryset
+            form&modelform 中如果想要用视图中的值(request)
+                重写def __init__(request,*args,**kwargs)
+                        super().__init__(*args,**kwargs)
+                        self.request =request
+            短信
+            redis(Django-redis)
+            倒计时
+    今日作业
+        点击注册按钮
+        短信登录
+        django实现图片验证码
+
+day04
+    内容回顾
+        项目规则
+            创建项目 静态、视图、路由
+        ajax
+            $.ajax({
+                url:'..',
+                type:'GET',
+                data:{},
+                dataType:'JSON',
+                success:function(data){
+                    console.log(data)
+                }
+            })
+        moldeform/form使用request
+            重写modelform/form的__init__方法，把想要的数据传递
+        django-redis
+    今日概要
+        点击注册
+        用户登录
+            短信验证码
+            手机or邮箱/密码登录
+        项目管理
+            创建星标

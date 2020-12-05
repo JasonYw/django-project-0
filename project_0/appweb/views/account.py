@@ -17,7 +17,7 @@ def send_sms(request):
     """
     发送短信
     """
-    form = SendSmsForm(data=request.GET)  # 校验手机号不能为空、格式是否正确
+    form = SendSmsForm(request, request.POST)  # 校验手机号不能为空、格式是否正确
     if form.is_valid():
         return JsonResponse({"status": True})
     return JsonResponse({"status": False, "error": form.errors})

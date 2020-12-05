@@ -3,13 +3,19 @@ import sys
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from redis_cache import get_redis_connection
+import random
 
 project_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 sys.path.append(project_dir)
 from appweb.models import UserInfo
-import random
-from utils.tencent.sms import LoginSMS, ReginterSMS, ResetPasswordSMS, RegisterUserSms
+from utils.tencent.sms import (
+    LoginSMS,
+    ReginterSMS,
+    ResetPasswordSMS,
+    RegisterUserSms,
+    LoginUserSms,
+    ResetPasswordSMS,
+)
 from django.shortcuts import HttpResponse
 
 
@@ -87,7 +93,7 @@ class RegisterModelForm(forms.ModelForm):
 
 
 class SendSmsForm(forms.Form):
-    mobile_phone = forms.CharField(
+    phonenumber = forms.CharField(
         label="手机号",
         validators=[RegexValidator(r"^(1[3-9]\d{9}$)", "手机号格式错误")],
         required=True,
@@ -97,15 +103,16 @@ class SendSmsForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.request = request
 
-    def clean_mobile_phone(self):
+    def clean_phonenumber(self):
         # 手机号校验的钩子
-        mobile_phone = self.cleaned_data["mobile_phone"]
+        phonenumber = self.cleaned_data["phonenumber"]
 
         # 验证码类别的钩子
-        functioncode = self.request.GET.get("functioncode")
+        functioncode = self.request.POST.get("functioncode")
 
         # 校验数据库中是否有手机号
-        if UserInfo.objects.filter(phonenumber=mobile_phone).exists():
+        if UserInfo.objects.filter(phonenumber=phonenumber).exists():
+            # self.add_error('mobile_phone','短信模板错误') 与下一行效果等效
             raise ValidationError("手机号已存在")
         if (
             functioncode != "register"
@@ -117,19 +124,17 @@ class SendSmsForm(forms.Form):
         # 发短信&验证码
         code = random.randrange(1000, 9999)
         if functioncode == "register":
-            res = ReginterSMS.send_sms_single(mobile_phone, code)
+            res = ReginterSMS.send_sms_single(phonenumber, code)
         if functioncode == "login":
-            res = LoginSMS.send_sms_single(mobile_phone, code)
+            res = LoginSMS.send_sms_single(phonenumber, code)
         if functioncode == "restpassword":
-            res = ResetPasswordSMS.send_sms_single(mobile_phone, code)
+            res = ResetPasswordSMS.send_sms_single(phonenumber, code)
         if res.get("result", None) != 0:
             raise ValidationError("短信发送失败")
 
         # 验证码写入redis
-        conn = get_redis_connection("default")
-        conn = set(mobile_phone, code, ex=60)
-
-        return mobile_phone
+        conn = RegisterUserSms.record_register(phonenumber, code)
+        return phonenumber
 
 
 # Create your models here.

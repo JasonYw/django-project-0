@@ -45,24 +45,27 @@
                 'csrfmiddlewaretoken': csrf,
                 'functioncode': 'register'
             },
+            dataType: "JSON", //将服务端返回的数据反序列化为json
             success: function (data) {
-                console.log(data)
-                // if (data == '200') {
-                //     var count = 60
-                //     var timer = setInterval(function () {
-                //         $(obj).removeAttr("onclick", "getcode(this)")
-                //         count--
-                //         $(obj).val(count + '秒后获取验证码')
-                //         if (count <= 0) {
-                //             clearInterval(timer)
-                //             $(obj).val('获取验证码')
-                //             $(obj).attr('onclick', 'getcode(this)')
-                //         }
-                //     }, 1000)
-
-                // } else {
-                //     alert(data)
-                // }
+                if (data.status) {
+                    $(obj).prop("disabled", true)
+                    var count = 60
+                    var timer = setInterval(function () {
+                        count--
+                        $(obj).val(count + '秒后获取验证码')
+                        if (count <= 0) {
+                            clearInterval(timer)
+                            $(obj).val('获取验证码')
+                            $(obj).prop("disabled", false)
+                        }
+                    }, 1000)
+                } else {
+                    console.log(data.error)
+                    $.each(data.error, function (key, value) {
+                        $('input[name=' + key + ']').val("")
+                        $('input[name=' + key + ']').attr('placeholder', value[0])
+                    })
+                }
             }
         })
     }

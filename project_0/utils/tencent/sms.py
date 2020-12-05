@@ -70,8 +70,8 @@ class BaseUserSms:
     )
 
     @classmethod
-    def record_register(cls, phonenumber, code):
-        cls.conn.set(phonenumber, str(code) + cls.functioncode, ex=600)
+    def record_register(cls, phonenumber, code, ex=60):
+        cls.conn.set(phonenumber, str(code) + cls.functioncode, ex=ex)
 
     @classmethod
     def get_record(cls, phonenumber):
