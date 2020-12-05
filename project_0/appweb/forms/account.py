@@ -3,7 +3,7 @@ import sys
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from django_redis import get_redis_connection
+from redis_cache import get_redis_connection
 
 project_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 sys.path.append(project_dir)
