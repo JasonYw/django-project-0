@@ -1,0 +1,28 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+{% block title %}登录{% endblock %}
+{% endblock %}
+<link rel="stylesheet" href="{% static 'appweb/css/account.css' %}">
+{% endblock %}
+{% block content %}
+<div class="account">
+    <h1>login</h1>
+    <form id='loginform'>
+        {% csrf_token %}
+        {% for filed in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{field.label}}</label>
+            {{filed}}
+        </div>
+        {% endfor %}
+        <div>
+            <input type="button" class="btn btn-primary" onclick="login();" value="登录">
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+</script>
+{% endblock %}

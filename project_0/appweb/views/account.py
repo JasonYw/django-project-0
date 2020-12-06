@@ -52,6 +52,7 @@ def login(request):
             obj = LoginPModelForm(request.GET)
         if request.GET.get("loginway") == "sms":
             obj = LoginSModelForm(request.GET)
+            return render(request, "logins.html", {"form": obj})
         return render(request, "login.html", {"form": obj})
 
     if request.method == "POST":
