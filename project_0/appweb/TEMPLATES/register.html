@@ -35,8 +35,8 @@
 {% block js %}
 <script>
     function getcode(obj) {
-        csrf = $('input[name="csrfmiddlewaretoken"]').val()
-        phonenumber = $('input[name="phonenumber"]').val()
+        var csrf = $('input[name="csrfmiddlewaretoken"]').val()
+        var phonenumber = $('input[name="phonenumber"]').val()
         $.ajax({
             url: '/appweb/send/sms/',
             type: 'POST',

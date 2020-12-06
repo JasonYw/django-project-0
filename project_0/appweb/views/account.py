@@ -13,7 +13,9 @@ from appweb.forms.account import (
     RegisterModelForm,
     SendSmsForm,
     ClickRegisterForm,
-    LoginModelForm,
+    LoginSModelForm,
+    LoginPModelForm,
+    ClickLoginForm,
 )
 from appweb.models import UserInfo
 
@@ -45,5 +47,17 @@ def register(request):
 
 def login(request):
     if request.method == "GET":
-        obj = LoginModelForm(request.GET)
+        obj = LoginPModelForm(request.GET)
+        if request.GET.get("loginway") == "password":
+            obj = LoginPModelForm(request.GET)
+        if request.GET.get("loginway") == "sms":
+            obj = LoginSModelForm(request.GET)
         return render(request, "login.html", {"form": obj})
+
+    if request.method == "POST":
+        obj = ClickLoginForm(request, data=request.POST)
+        if obj.is_valid():
+            request.session["email"] = request.POST.get("email")
+            return JsonResponse({"status": True, "message": 200})
+        else:
+            return JsonResponse({"status": False, "message": obj.errors})

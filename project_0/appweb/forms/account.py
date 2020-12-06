@@ -211,7 +211,7 @@ class ClickRegisterForm(forms.Form):
         return phonenumber
 
 
-class LoginModelForm(forms.ModelForm):
+class LoginPModelForm(forms.ModelForm):
 
     email = forms.EmailField(
         label="邮箱",
@@ -241,6 +241,73 @@ class LoginModelForm(forms.ModelForm):
     class Meta:
         model = UserInfo
         fields = ["email", "password"]
+
+
+class LoginSModelForm(forms.ModelForm):
+
+    phonenumber = forms.CharField(
+        label="手机号",
+        required=True,
+        validators=[RegexValidator(r"^(1[3-9]\d{9}$)", "手机号格式错误")],
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入手机号"}
+        ),
+        error_messages={"required": "手机号不能为空"},
+    )
+
+    code = forms.CharField(
+        label="验证码",
+        required=True,
+        validators=[RegexValidator(r"^\d{4}$", "验证码格式错误")],
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入验证码"}
+        ),
+        error_messages={"required": "验证码不能为空"},
+    )
+
+    class Meta:
+        model = UserInfo
+        fields = ["phonenumber"]
+
+
+class ClickLoginForm(forms.Form):
+    email = forms.EmailField(
+        label="邮箱",
+        required=True,
+        error_messages={"required": "邮箱不能为空"},
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入注册邮箱"}
+        ),
+    )
+
+    password = forms.CharField(
+        label="密码",
+        required=True,
+        validators=[RegexValidator(r"^[0-9a-zA-Z\-_@#\$%\&\=\+\!]+$", "密码格式错误")],
+        max_length=20,
+        min_length=8,
+        error_messages={
+            "required": "密码不能为空",
+            "max_length": "密码不能超过20个字符",
+            "min_length": "密码不能小于8个字符",
+        },
+    )
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    def clean_email(self):
+        email = self.request.POST.get("email")
+        password = self.request.POST.get("password")
+
+        if not UserInfo.objects.filter(email=email).exists():
+            raise ValidationError("邮箱不存在")
+
+        if UserInfo.objects.filter(email=email).first().password != password:
+            raise ValidationError("密码错误")
+
+        return email
 
 
 # Create your models here.

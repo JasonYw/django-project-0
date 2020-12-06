@@ -16,10 +16,39 @@
         </div>
         {% endfor %}
         <div>
-            <input type="button" class="btn btn-primary" onclick="" value="登录">
+            <input type="button" class="btn btn-primary" onclick="login();" value="登录">
         </div>
     </form>
 </div>
 {% endblock %}
 {% block js %}
+<script>
+    function login() {
+        var csrf = $('input[name="csrfmiddlewaretoken"]').val()
+        var email = $('input[name="email"]').val()
+        var password = $('input[name="password"]').val()
+        $.ajax({
+            url: "/appweb/login/",
+            type: "POST",
+            data: {
+                'csrfmiddlewaretoken': csrf,
+                'email': email,
+                'password': password
+            },
+            dataType: "JSON",
+            success: function (data) {
+                if (!data.status) {
+                    $('#id_password').val("")
+                    console.log(data.message)
+                    $.each(data.message, function (key, value) {
+                        $('#id_' + key).val("")
+                        $('input[name=' + key + ']').attr('placeholder', value[0])
+                    })
+                } else {
+                    alert(data.status)
+                }
+            }
+        })
+    }
+</script>
 {% endblock %}
