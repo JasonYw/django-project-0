@@ -25,14 +25,14 @@
 <script>
     function login() {
         var csrf = $('input[name="csrfmiddlewaretoken"]').val()
-        var email = $('input[name="email"]').val()
+        var userid = $('input[name="userid"]').val()
         var password = $('input[name="password"]').val()
         $.ajax({
             url: "/appweb/login/",
             type: "POST",
             data: {
                 'csrfmiddlewaretoken': csrf,
-                'email': email,
+                'userid': userid,
                 'password': password
             },
             dataType: "JSON",

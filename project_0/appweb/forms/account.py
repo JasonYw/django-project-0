@@ -4,6 +4,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 import random
+import re
 
 project_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 sys.path.append(project_dir)
@@ -213,13 +214,13 @@ class ClickRegisterForm(forms.Form):
 
 class LoginPModelForm(forms.ModelForm):
 
-    email = forms.EmailField(
-        label="邮箱",
+    userid = forms.CharField(
+        label="邮箱/手机号",
         required=True,
         widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "请输入注册邮箱"}
+            attrs={"class": "form-control", "placeholder": "请输入注册邮箱/手机号"}
         ),
-        error_messages={"required": "邮箱不能为空"},
+        error_messages={"required": "邮箱/手机号不能为空"},
     )
 
     password = forms.CharField(
@@ -240,7 +241,66 @@ class LoginPModelForm(forms.ModelForm):
 
     class Meta:
         model = UserInfo
-        fields = ["email", "password"]
+        fields = ["userid", "password"]
+
+
+class ClickLoginPForm(forms.Form):
+    userid = forms.CharField(
+        label="邮箱/手机号",
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入注册邮箱/手机号"}
+        ),
+        error_messages={"required": "邮箱/手机号不能为空"},
+    )
+
+    password = forms.CharField(
+        label="密码",
+        required=True,
+        validators=[RegexValidator(r"^[0-9a-zA-Z\-_@#\$%\&\=\+\!]+$", "密码格式错误")],
+        max_length=20,
+        min_length=8,
+        error_messages={
+            "required": "密码不能为空",
+            "max_length": "密码不能超过20个字符",
+            "min_length": "密码不能小于8个字符",
+        },
+    )
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    def clean_userid(self):
+        userid = self.request.POST.get("userid")
+        print(userid)
+        password = self.request.POST.get("password")
+        email = re.findall(
+            r"^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$", userid
+        )
+        phonenumber = re.findall(r"^(1[3-9]\d{9}$)", userid)
+        if email == phonenumber:
+            raise ValidationError("格式错误")
+
+        if len(phonenumber):
+
+            if not UserInfo.objects.filter(phonenumber=userid).exists():
+                raise ValidationError("手机号不存在")
+            if UserInfo.objects.filter(phonenumber=userid).first().password != password:
+                raise ValidationError("密码错误")
+            else:
+                self.request.session["email"] = email
+
+        if len(email):
+
+            if not UserInfo.objects.filter(email=userid).exists():
+                raise ValidationError("邮箱不存在")
+            if UserInfo.objects.filter(email=userid).first().password != password:
+                raise ValidationError("密码错误")
+            else:
+                self.request.session["phonenumber"] = phonenumber
+
+        return userid
 
 
 class LoginSModelForm(forms.ModelForm):
@@ -267,47 +327,42 @@ class LoginSModelForm(forms.ModelForm):
 
     class Meta:
         model = UserInfo
-        fields = ["phonenumber"]
+        fields = ["phonenumber", "code"]
 
 
-class ClickLoginForm(forms.Form):
-    email = forms.EmailField(
-        label="邮箱",
+class ClickLoginSModelForm(forms.Form):
+
+    phonenumber = forms.CharField(
+        label="手机号",
         required=True,
-        error_messages={"required": "邮箱不能为空"},
+        validators=[RegexValidator(r"^(1[3-9]\d{9}$)", "手机号格式错误")],
         widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "请输入注册邮箱"}
+            attrs={"class": "form-control", "placeholder": "请输入手机号"}
         ),
+        error_messages={"required": "手机号不能为空"},
     )
 
-    password = forms.CharField(
-        label="密码",
+    code = forms.CharField(
+        label="验证码",
         required=True,
-        validators=[RegexValidator(r"^[0-9a-zA-Z\-_@#\$%\&\=\+\!]+$", "密码格式错误")],
-        max_length=20,
-        min_length=8,
-        error_messages={
-            "required": "密码不能为空",
-            "max_length": "密码不能超过20个字符",
-            "min_length": "密码不能小于8个字符",
-        },
+        validators=[RegexValidator(r"^\d{4}$", "验证码格式错误")],
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "请输入验证码"}
+        ),
+        error_messages={"required": "验证码不能为空"},
     )
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.request = request
 
-    def clean_email(self):
-        email = self.request.POST.get("email")
-        password = self.request.POST.get("password")
+    def clean_phonenumber(self):
+        phonenumber = self.request.POST.get("phonenumber")
+        code = self.request.POST.get("code")
+        if LoginUserSms.get_record(phonenumber) != code:
+            raise ValidationError("验证码不正确")
 
-        if not UserInfo.objects.filter(email=email).exists():
-            raise ValidationError("邮箱不存在")
-
-        if UserInfo.objects.filter(email=email).first().password != password:
-            raise ValidationError("密码错误")
-
-        return email
+        return phonenumber
 
 
 # Create your models here.
