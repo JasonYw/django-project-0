@@ -127,18 +127,19 @@ class SendSmsForm(forms.Form):
                 raise ValidationError("手机号已存在")
             else:
                 res = ReginterSMS.send_sms_single(phonenumber, code)
+                # 验证码写入redis
+                conn = RegisterUserSms.record_register(phonenumber, code)
         if functioncode == "login":
             if not UserInfo.objects.filter(phonenumber=phonenumber).exists():
                 raise ValidationError("手机号不存在")
             else:
                 res = LoginSMS.send_sms_single(phonenumber, code)
+                conn = LoginUserSms.record_register(phonenumber, code)
         if functioncode == "restpassword":
             res = ResetPasswordSMS.send_sms_single(phonenumber, code)
         if res.get("result", None) != 0:
             raise ValidationError("短信发送失败")
 
-        # 验证码写入redis
-        conn = RegisterUserSms.record_register(phonenumber, code)
         return phonenumber
 
 
@@ -334,7 +335,7 @@ class LoginSModelForm(forms.ModelForm):
         fields = ["phonenumber", "code"]
 
 
-class ClickLoginSModelForm(forms.Form):
+class ClickLoginSForm(forms.Form):
 
     phonenumber = forms.CharField(
         label="手机号",

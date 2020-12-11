@@ -16,6 +16,7 @@ from appweb.forms.account import (
     LoginSModelForm,
     LoginPModelForm,
     ClickLoginPForm,
+    ClickLoginSForm,
 )
 from appweb.models import UserInfo
 
@@ -54,7 +55,10 @@ def login(request):
         return render(request, "login.html", {"form": obj})
 
     if request.method == "POST":
-        obj = ClickLoginPForm(request, data=request.POST)
+        if request.POST.get("way", None) == "sms":
+            obj = ClickLoginSForm(request, data=request.POST)
+        else:
+            obj = ClickLoginPForm(request, data=request.POST)
         if obj.is_valid():
             return JsonResponse({"status": True, "message": 200})
         else:

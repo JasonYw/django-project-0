@@ -10,19 +10,20 @@
     <form id='loginform'>
         {% csrf_token %}
         {% for filed in form %}
-            {% if filed.name == 'code'%}
-                <div class="form-group">
-                    <div class="clearfix">
-                        <div class="col-md-6" style="padding: 0;">{{filed}}</div>
-                        <div class="col-md-6"><input type="button" class="btn btn-default" value="获取验证码" onclick="getcode(this);"></div>
-                        </div>
-                </div>
-            {% else %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{field.label}}</label>
-                    {{filed}}
-                </div>
-            {% endif %}
+        {% if filed.name == 'code'%}
+        <div class="form-group">
+            <div class="clearfix">
+                <div class="col-md-6" style="padding: 0;">{{filed}}</div>
+                <div class="col-md-6"><input type="button" class="btn btn-default" value="获取验证码"
+                        onclick="getcode(this);"></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{field.label}}</label>
+            {{filed}}
+        </div>
+        {% endif %}
         {% endfor %}
         <div>
             <input type="button" class="btn btn-primary" onclick="login();" value="登录">
@@ -32,36 +33,64 @@
 {% endblock %}
 {% block js %}
 <script>
-    function getcode(obj){
-        var csrf =$('input[name="csrfmiddlewaretoken"]').val()
+    function getcode(obj) {
+        var csrf = $('input[name="csrfmiddlewaretoken"]').val()
         var phonenumber = $('input[name=phonenumber]').val()
         $.ajax({
-            url:'/appweb/send/sms/',
-            type:'POST',
-            data:{
-                'csrfmiddlewaretoken':csrf,
-                'phonenumber':phonenumber,
-                'functioncode':'login'
+            url: '/appweb/send/sms/',
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrf,
+                'phonenumber': phonenumber,
+                'functioncode': 'login'
             },
-            dataType:'JSON',
-            success: function (data){
-                if (!data.status){
-                    $.each(data.message,function(key,value){
-                        $('#id_'+key).val("")
-                        $('#id_'+key).attr('placeholder',value[0])
+            dataType: 'JSON',
+            success: function (data) {
+                if (!data.status) {
+                    $.each(data.message, function (key, value) {
+                        $('#id_' + key).val("")
+                        $('#id_' + key).attr('placeholder', value[0])
                     })
-                }else{
-                    $(obj).prop("disabled",true)
-                    var count =60
-                    var timer =setInterval(function(){
+                } else {
+                    $(obj).prop("disabled", true)
+                    var count = 60
+                    var timer = setInterval(function () {
                         count--
-                        $(obj).val(count+'秒后获取验证码')
-                        if (count <=0){
+                        $(obj).val(count + '秒后获取验证码')
+                        if (count <= 0) {
                             clearInterval(timer)
                             $(obj).val('获取验证码')
-                            $(obj).prop("disabled",false)
+                            $(obj).prop("disabled", false)
                         }
-                    },1000)
+                    }, 1000)
+                }
+            }
+        })
+    }
+
+    function login() {
+        var csrf = $('input[name="csrfmiddlewaretoken"]').val()
+        var code = $('#id_code').val()
+        var phonenumber = $('#id_phonenumber').val()
+        $.ajax({
+            url: '/appweb/login/',
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrf,
+                'code': code,
+                'functioncode': 'login',
+                'phonenumber': phonenumber,
+                'way': 'sms',
+            },
+            dataType: 'JSON',
+            success: function (data) {
+                if (!data.status) {
+                    $.each(data.message, function (key, value) {
+                        $('#id_' + key).val("")
+                        $('#id_' + key).attr('placeholder', value[0])
+                    })
+                } else {
+                    alert('200')
                 }
             }
         })
