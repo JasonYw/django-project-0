@@ -60,7 +60,7 @@
                         }
                     }, 1000)
                 } else {
-                    console.log(data.error)
+                    console.log(data.message)
                     $.each(data.error, function (key, value) {
                         $('input[name=' + key + ']').val("")
                         $('input[name=' + key + ']').attr('placeholder', value[0])

@@ -27,7 +27,7 @@ def send_sms(request):
     obj = SendSmsForm(request, request.POST)  # 校验手机号不能为空、格式是否正确
     if obj.is_valid():
         return JsonResponse({"status": True})
-    return JsonResponse({"status": False, "error": obj.errors})
+    return JsonResponse({"status": False, "message": obj.errors})
 
 
 def register(request):

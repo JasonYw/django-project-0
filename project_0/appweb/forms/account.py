@@ -111,10 +111,7 @@ class SendSmsForm(forms.Form):
         # 验证码类别的钩子
         functioncode = self.request.POST.get("functioncode")
 
-        # 校验数据库中是否有手机号
-        if UserInfo.objects.filter(phonenumber=phonenumber).exists():
-            # self.add_error('mobile_phone','短信模板错误') 与下一行效果等效
-            raise ValidationError("手机号已存在")
+        # 校验数据库中是否有模版
         if (
             functioncode != "register"
             and functioncode != "login"
@@ -125,9 +122,16 @@ class SendSmsForm(forms.Form):
         # 发短信&验证码
         code = random.randrange(1000, 9999)
         if functioncode == "register":
-            res = ReginterSMS.send_sms_single(phonenumber, code)
+            if UserInfo.objects.filter(phonenumber=phonenumber).exists():
+                # self.add_error('mobile_phone','短信模板错误') 与下一行效果等效
+                raise ValidationError("手机号已存在")
+            else:
+                res = ReginterSMS.send_sms_single(phonenumber, code)
         if functioncode == "login":
-            res = LoginSMS.send_sms_single(phonenumber, code)
+            if not UserInfo.objects.filter(phonenumber=phonenumber).exists():
+                raise ValidationError("手机号不存在")
+            else:
+                res = LoginSMS.send_sms_single(phonenumber, code)
         if functioncode == "restpassword":
             res = ResetPasswordSMS.send_sms_single(phonenumber, code)
         if res.get("result", None) != 0:
